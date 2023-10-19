@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise Recommendations</title>
+    <style>
+        /* CSS for Survey-Like Layout */
+
+        /* Container for the survey */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Survey section styling */
+        .section {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        /* Section headings */
+        .section h2 {
+            font-size: 20px;
+            margin: 0;
+            padding: 5px 0;
+        }
+
+        /* Radio and checkbox labels */
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Radio and checkbox input elements */
+        input[type="radio"],
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        /* Dropdown select */
+        select {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+        }
+
+        /* Submit button */
+        .btn {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Three-column layout for Primary Muscles, Secondary Muscles, and Equipment sections */
+        .section.three-column {
+            display: flex;
+            justify-content: space-between;
+            border: none;
+        }
+
+        /* Adjust the width of each column */
+        .section.three-column .column {
+            width: 30%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Exercise Recommendations</h1>
+        <form method="POST" action="/recommend">
+            <!-- Primary Muscles Options -->
+            <div class="section">
+                <h2>Primary Muscles</h2>
+                <div class="section three-column">
+                    <div class="column">
+                        {% set primary_muscles = ['Abdominals', 'Abductors', 'Adductors', 'Biceps', 'Calves', 'Chest']
+                        %}
+                        {% for muscle in primary_muscles %}
+                        <label for="{{ muscle }}">
+                            <input type="radio" name="primaryMuscles" value="{{ muscle }}" id="{{ muscle }}">
+                            {{ muscle }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <div class="column">
+                        {% set primary_muscles = ['Forearms','Glutes', 'Hamstrings', 'Lats', 'Lower Back', 'Middle
+                        Back'] %}
+                        {% for muscle in primary_muscles %}
+                        <label for="{{ muscle }}">
+                            <input type="radio" name="primaryMuscles" value="{{ muscle }}" id="{{ muscle }}">
+                            {{ muscle }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <div class="column">
+                        {% set primary_muscles = ['Neck', 'Quadriceps','Shoulders', 'Traps', 'Triceps'] %}
+                        {% for muscle in primary_muscles %}
+                        <label for="{{ muscle }}">
+                            <input type="radio" name="primaryMuscles" value="{{ muscle }}" id="{{ muscle }}">
+                            {{ muscle }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Secondary Muscles Options -->
+            <div class="section">
+                <h2>Secondary Muscles</h2>
+                <div class="section three-column">
+                    <div class="column">
+                        {% set secondary_muscles = ['Abdominals', 'Abductors', 'Adductors', 'Biceps', 'Calves', 'Chest']
+                        %}
+                        {% for muscle in secondary_muscles %}
+                        <label for="{{ muscle }}">
+                            <input type="checkbox" name="secondaryMuscles" value="{{ muscle }}" id="{{ muscle }}">
+                            {{ muscle }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <div class="column">
+                        {% set secondary_muscles = ['Forearms','Glutes', 'Hamstrings', 'Lats', 'Lower Back', 'Middle
+                        Back'] %}
+                        {% for muscle in secondary_muscles %}
+                        <label for="{{ muscle }}">
+                            <input type="checkbox" name="secondaryMuscles" value="{{ muscle }}" id="{{ muscle }}">
+                            {{ muscle }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <div class="column">
+                        {% set secondary_muscles = ['Neck', 'Quadriceps','Shoulders', 'Traps', 'Triceps'] %}
+                        {% for muscle in secondary_muscles %}
+                        <label for="{{ muscle }}">
+                            <input type="checkbox" name="secondaryMuscles" value="{{ muscle }}" id="{{ muscle }}">
+                            {{ muscle }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level Options -->
+            <div class="section">
+                <h2>Level</h2>
+                <label for="beginner">
+                    <input type="radio" name="level" value="beginner" id="beginner">
+                    Beginner
+                </label>
+                <label for="intermediate">
+                    <input type="radio" name="level" value="intermediate" id="intermediate">
+                    Intermediate
+                </label>
+                <label for="expert">
+                    <input type="radio" name="level" value="expert" id="expert">
+                    Expert
+                </label>
+            </div>
+
+            <!-- Equipment Options -->
+            <div class="section">
+                <h2>Equipment</h2>
+                <div class="section three-column">
+                    <div class="column">
+                        {% set equipment_options = ['Body Only', 'Bands', 'Barbell', 'Cable'] %}
+                        {% for option in equipment_options %}
+                        <label for="{{ option }}">
+                            <input type="radio" name="equipment" value="{{ option }}" id="{{ option }}">
+                            {{ option | capitalize }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <div class="column">
+                        {% set equipment_options = ['Dumbbell', 'Exercise Ball', 'E-Z Curl Bar', 'Foam Roll'] %}
+                        {% for option in equipment_options %}
+                        <label for="{{ option }}">
+                            <input type="radio" name="equipment" value="{{ option }}" id="{{ option }}">
+                            {{ option | capitalize }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <div class="column">
+                        {% set equipment_options = ['Kettlebells', 'Machine', 'Medicine Ball', 'Other'] %}
+                        {% for option in equipment_options %}
+                        <label for="{{ option }}">
+                            <input type="radio" name="equipment" value="{{ option }}" id="{{ option }}">
+                            {{ option | capitalize }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Force Options -->
+            <div class="section">
+                <h2>Force</h2>
+                <label for="pull">
+                    <input type="radio" name="force" value="pull" id="pull">
+                    Pull
+                </label>
+                <label for="push">
+                    <input type="radio" name="force" value="push" id="push">
+                    Push
+                </label>
+                <label for="static">
+                    <input type="radio" name="force" value="static" id="static">
+                    Static
+                </label>
+            </div>
+
+            <!-- Mechanic Options -->
+            <div class="section">
+                <h2>Mechanic</h2>
+                <label for="compound">
+                    <input type="radio" name="mechanic" value="compound" id="compound">
+                    Compound
+                </label>
+                <label for="isolation">
+                    <input type="radio" name="mechanic" value="isolation" id="isolation">
+                    Isolation
+                </label>
+            </div>
+
+            <!-- Category Options -->
+            <div class="section">
+                <h2>Category</h2>
+                {% set categories = ['Cardio', 'Olympic Weightlifting', 'Plyometrics', 'Powerlifting', 'Strength',
+                'Stretching', 'Strongman'] %}
+                <select name="category">
+                    <option value="">Select a category</option>
+                    {% for category in categories %}
+                    <option value="{{ category }}">{{ category }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn">Recommend Exercises</button>
+        </form>
+    </div>
+</body>
+
+</html>

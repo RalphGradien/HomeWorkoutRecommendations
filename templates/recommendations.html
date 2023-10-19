@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise Recommendations</title>
+    <style>
+        /* CSS for Exercise Recommendations */
+
+        /* Container for the recommended exercises */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Exercise frame */
+        .exercise-frame {
+            border: 2px solid #333;
+            padding: 10px;
+            margin: 20px 0;
+        }
+
+        /* Exercise name style */
+        .exercise-name {
+            font-size: 24px;
+        }
+
+        /* Images section */
+        .images-section {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Image style */
+        .exercise-image {
+            max-width: 48%;
+            border: 1px solid #333;
+        }
+
+        /* Instructions section */
+        .instructions-section {
+            padding: 10px 0;
+        }
+
+        /* Instruction style with numbered steps */
+        .instruction {
+            counter-increment: step;
+            margin-bottom: 10px;
+        }
+
+        .instruction::before {
+            content: counter(step);
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        /* User input section */
+        .user-input {
+            margin-top: 20px;
+        }
+
+        /* User input label style */
+        .user-input label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Exercise Recommendations</h1>
+        <h2>Recommended Exercises</h2>
+        <ul>
+            {% for exercise in recommendations %}
+            <li class="exercise-frame">
+                <h3 class="exercise-name">{{ exercise.name }}</h3>
+
+                <!-- Display Images -->
+                <div class="images-section">
+                    {% for image in exercise.images %}
+                    <img class="exercise-image"
+                        src="{{ url_for('static', filename='/exercises/' ~ exercise.id ~ '/images/' ~ image) }}"
+                        alt="Exercise Image">
+                    {% endfor %}
+                </div>
+
+                <!-- Display Instructions -->
+                <div class="instructions-section">
+                    {% for instruction in exercise.instructions %}
+                    <p class="instruction">{{ instruction|safe }}</p>
+                    {% endfor %}
+                </div>
+
+            </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Display the user input data including secondary muscles -->
+        <div class="user-input">
+            <h2>User Input:</h2>
+            <p><label>Force:</label> {{ user_input.force }}</p>
+            <p><label>Level:</label> {{ user_input.level }}</p>
+            <p><label>Mechanic:</label> {{ user_input.mechanic }}</p>
+            <p><label>Equipment:</label> {{ user_input.equipment }}</p>
+            <p><label>Primary Muscles:</label> {{ user_input.primaryMuscles }}</p>
+
+            <!-- Display the Secondary Muscles without brackets and quotes -->
+            <p><label>Secondary Muscles:</label> {{ user_input.secondaryMuscles | join(', ') }}</p>
+
+            <p><label>Category:</label> {{ user_input.category }}</p>
+        </div>
+    </div>
+</body>
+
+</html>
