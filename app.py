@@ -1,4 +1,4 @@
-import json
+import json, re
 from flask import Flask, render_template, request
 from flask_pymongo import PyMongo
 import pandas as pd
@@ -36,8 +36,8 @@ client = MongoClient("mongodb://localhost:27017/")
 db = client["exercisesdb"]
 collection = db["exercises"]
 
-# # Drop the collection
-# db["exercises"].drop()
+# Drop the collection
+db["exercises"].drop()
 
 # Insert the CSV data into MongoDB
 df_dict = df.to_dict(orient='records')
@@ -88,11 +88,10 @@ def get_content_based_recommendations(user_input, cosine_sim=cosine_sim):
     for exercise_id in recommended_exercises:
         exercise_doc = collection.find_one({"id": exercise_id})
 
-        # Clean the instructions: Remove square brackets and split into a list
+        # Clean the instructions: Split into steps based on periods and commas
         if 'instructions' in exercise_doc:
             instructions = exercise_doc['instructions']
-            instructions = instructions.strip("[]")
-            instructions = instructions.split("', '")
+            instructions = [step.strip() for step in re.split(r'['',]', instructions)]
             exercise_doc['instructions'] = instructions
 
         exercise_data.append(exercise_doc)
@@ -110,6 +109,7 @@ def recommend_exercises():
     secondary_muscles = request.form.getlist('secondaryMuscles')
     user_input['secondaryMuscles'] = secondary_muscles
     content_based_recommendations = get_content_based_recommendations(user_input)
+    print(content_based_recommendations)
     return render_template('recommendations.html', recommendations=content_based_recommendations, user_input=user_input)
 
 if __name__ == '__main__':
