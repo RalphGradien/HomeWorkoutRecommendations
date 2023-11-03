@@ -69,28 +69,25 @@ selected_primary_muscle = ""
 
 @app.route('/')
 def home():
-    return redirect(url_for('select_muscle'))
+    return redirect(url_for('primary_muscle'))
 
-@app.route('/select-muscle', methods=['GET', 'POST'])
-def select_muscle():
+@app.route('/primary-muscle', methods=['GET', 'POST']) 
+def primary_muscle():
     if request.method == 'POST':
         primary_muscle = request.form.get('primaryMuscle')
-
-        print("Primary muscle 1: " + primary_muscle)
-
         if primary_muscle:
             session['selected_primary_muscle'] = primary_muscle
-            return redirect(url_for('index'))
+            return redirect(url_for('user_input'))
 
-    primary_muscles_left = ["Neck", "Traps", "Shoulders", "Chest", "Biceps", "Forearms", "Abdominals", "Quadriceps", "Adductors", "Calves"]
+    primary_muscles_left = ["Neck", "Shoulders", "Chest", "Biceps", "Forearms", "Abdominals", "Quadriceps", "Adductors", "Calves"]
     primary_muscles_right = ["Traps", "Triceps", "Lats", "Middle Back", "Lower Back", "Abductors", "Glutes", "Hamstrings", "Calves"]
 
-    return render_template('muscle_selection.html', primary_muscles=primary_muscles_left + primary_muscles_right)
+    return render_template('primary_muscle.html', primary_muscles=primary_muscles_left + primary_muscles_right)
 
-@app.route('/index')
-def index():
+@app.route('/user-input')
+def user_input():
     selected_primary_muscle = session.get('selected_primary_muscle', None)
-    return render_template('index.html', primaryMuscle=selected_primary_muscle)
+    return render_template('user_input.html', primaryMuscle=selected_primary_muscle)
 
 @app.route('/recommend', methods=['GET', 'POST'])
 def recommend_exercises():
@@ -142,16 +139,6 @@ def recommend_exercises():
                 exercise_data.append(exercise_doc)
         # Render the recommendations template with the results
         return render_template('recommendations.html', recommendations=exercise_data, user_input=user_input, primaryMuscle=selected_primary_muscle)
-
-    elif request.method == 'GET':
-        # Handle the "GET" request
-        if selected_primary_muscle is None:
-            return "Please select a primary muscle first."
-
-        primary_muscles_left = ["Neck", "Traps", "Shoulders", "Chest", "Biceps", "Forearms", "Abdominals", "Quadriceps", "Adductors", "Calves"]
-        primary_muscles_right = ["Traps", "Triceps", "Lats", "Middle Back", "Lower Back", "Abductors", "Glutes", "Hamstrings", "Calves"]
-
-        return render_template('muscle_selection.html', primaryMuscles=primary_muscles_left + primary_muscles_right)
 
 if __name__ == '__main__':
     app.run(debug=True)
