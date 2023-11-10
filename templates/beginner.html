@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beginner Exercise Recommendations</title>
+    <style>
+        /* Global styles */
+        /* Header styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+        }
+
+        body {
+            font-family: 'PrimaryMuscleFont', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 80px auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* CSS for Section */
+        .section {
+            display: flex;
+            font-size: 1.125rem;
+            flex-direction: column;
+            width: 100%;
+            max-width: 100%;
+            /* padding: 20px; */
+            /* background: #f5f5f5; */
+        }
+
+        .section h2 {
+            font-size: 24px;
+            margin: 10px 0;
+        }
+
+        /* Checkbox styles */
+        label {
+            display: inline-flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        input[type="checkbox"],
+        input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+
+        /* Three-column layout styles */
+        .section-three-column {
+            display: flex;
+            justify-content: space-between;
+            border: none;
+            align-content: flex-start;
+            font-size: 1.125rem;
+        }
+
+        .column {
+            margin-right: 18%;
+        }
+
+        /* Responsive layout styles */
+        @media (max-width: 768px) {
+            .section {
+                width: 100%;
+            }
+
+            .column {
+                flex-basis: calc(50% - 20px);
+            }
+        }
+
+        /* Additional styles for buttons */
+        .btn {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: .375rem;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* CSS for Muscle Selection */
+        .muscle-selection {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 0px;
+            box-sizing: border-box;
+            border: none;
+        }
+
+        select {
+            width: 30%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            font-size: 1.125rem;
+        }
+
+        .muscle-layout {
+            display: flex;
+            justify-content: space between;
+            align-items: flex-start;
+            flex-grow: 1;
+        }
+
+        .muscle-list {
+            width: 15%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .muscle-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .muscle-list li {
+            margin-bottom: 15px;
+            margin-top: 60%;
+        }
+
+        .muscle-list a {
+            display: block;
+            text-decoration: none;
+            color: black;
+            padding: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .muscle-list a:hover {
+            background-color: #e0e0e0;
+        }
+
+        .muscle-picture {
+            width: 70%;
+            /* Adjust the width as needed */
+            box-sizing: border-box;
+        }
+
+        .muscle-picture img {
+            width: 100%;
+        }
+
+        /* CSS for Primary Muscle Buttons */
+        .primaryMuscle {
+            background: #fff;
+            backface-visibility: hidden;
+            border-radius: .375rem;
+            border-style: solid;
+            border-width: .11rem;
+            box-sizing: border-box;
+            color: #212121;
+            cursor: pointer;
+            display: inline-block;
+            font-family: Circular, Helvetica, sans-serif;
+            font-size: 1.125rem;
+            font-weight: 600;
+            letter-spacing: -.01em;
+            padding: .8rem 1rem;
+            width: 145px;
+            text-align: left;
+            text-decoration: none;
+            transform: translateZ(0) scale(1);
+            transition: transform .2s;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .primaryMuscle:not(:disabled):hover {
+            transform: scale(1.05);
+        }
+
+        .primaryMuscle:not(:disabled):hover:active {
+            transform: scale(1.05) translateY(.125rem);
+        }
+
+        .primaryMuscle:focus {
+            outline: 0 solid transparent;
+        }
+
+        .primaryMuscle:focus:before {
+            content: "";
+            left: calc(-1*.375rem);
+            pointer-events: none;
+            position: absolute;
+            top: calc(-1*.375rem);
+            transition: border-radius;
+            user-select: none;
+        }
+
+        .primaryMuscle:focus:not(:focus-visible) {
+            outline: 0 solid transparent;
+        }
+
+        .primaryMuscle:focus:not(:focus-visible):before {
+            border-width: 0;
+        }
+
+        .primaryMuscle:not(:disabled):active {
+            transform: translateY(.125rem);
+        }
+
+        /* CSS for highlighting the selected primary muscle */
+        .primaryMuscle.selected {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        /* CSS for navigation and background */
+        /* Global styles */
+        body {
+            font-family: 'PrimaryMuscleFont', sans-serif;
+            margin: 0;
+            padding: 0;
+            /* background-image: url('{{ url_for("static", filename="welcome_background.jpg") }}'); */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            width: 88px;
+            height: 50px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        nav ul li {
+            margin: 0 15px;
+            font-size: 1.2em;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color:  #007BFF;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: rgb(61, 229, 83);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <a href="/welcome"><img src="{{ url_for('static', filename='logo_user.jpg') }}" alt="Logo"></a>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/welcome">Home</a></li>
+                <li><a href="/beginner">Beginner</a></li>
+                <li><a href="/advanced">Advanced</a></li>
+                <!-- <li><a href="/insight">Insight</a></li> -->
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <h1>Select Your Target Muscle And Equipment</h1>
+        <form method="POST" action="/beginner">
+            <input type="hidden" name="selectedPrimaryMuscle" id="selectedPrimaryMuscle"
+                value="{{ selectedPrimaryMuscle }}">
+            <input type="hidden" name="pageSource" value="beginner">
+            <div class="muscle-selection">
+                <!-- Content for selecting primary muscles -->
+                <div class="muscle-layout">
+                    <div class="muscle-list">
+                        <ul>
+                            <!-- Loop through primary muscles -->
+                            {% for muscle in primary_muscles[:4] %}
+                            <li>
+                                <button
+                                    class="primaryMuscle{% if muscle == selectedPrimaryMuscle %} selected{% endif %}"
+                                    type="button" data-muscle="{{ muscle }}"
+                                    onclick="selectPrimaryMuscle('{{ muscle }}')">
+                                    {{ muscle }}
+                                </button>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="muscle-picture">
+                        <img src="{{ url_for('static', filename='beginner.jpg') }}"
+                            alt="Human Body Picture">
+                    </div>
+                    <div class="muscle-list">
+                        <ul>
+                            <!-- Loop through primary muscles (second group) -->
+                            {% for muscle in primary_muscles[4:] %}
+                            <li>
+                                <button
+                                    class="primaryMuscle{% if muscle == selectedPrimaryMuscle %} selected{% endif %}"
+                                    type="button" data-muscle="{{ muscle }}"
+                                    onclick="selectPrimaryMuscle('{{ muscle }}')">
+                                    {{ muscle }}
+                                </button>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <form method="POST" action="/recommend">
+            <!-- Equipment Options -->
+            <h2>Select the equipment</h2>
+            <div class="section">
+                <input type="hidden" name="selectedEquipment" value="{{ selectedEquipment }}">
+                <div class="section-three-column">
+                    <div class="column">
+                        {% set equipment_options = ['Body Only', 'Bands', 'Barbell', 'Cable'] %}
+                        {% for option in equipment_options %}
+                        <label for="{{ option }}">
+                            <input type="radio" name="equipment" value="{{ option }}" id="{{ option }}">
+                            {{ option | capitalize }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <div class="column">
+                        {% set equipment_options = ['Dumbbell', 'Exercise Ball', 'E-Z Curl Bar', 'Foam Roll'] %}
+                        {% for option in equipment_options %}
+                        <label for "{{ option }}">
+                            <input type="radio" name="equipment" value="{{ option }}" id="{{ option }}">
+                            {{ option | capitalize }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <div class="column">
+                        {% set equipment_options = ['Kettlebells', 'Machine', 'Medicine Ball', 'Other'] %}
+                        {% for option in equipment_options %}
+                        <label for="{{ option }}">
+                            <input type="radio" name="equipment" value="{{ option }}" id="{{ option }}">
+                            {{ option | capitalize }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn">Recommend Exercises</button>
+        </form>
+    </div>
+    <script>
+        // Update selectPrimaryMuscle function
+        function selectPrimaryMuscle(muscle) {
+            selectedPrimaryMuscle = muscle;
+            document.querySelector("#selectedPrimaryMuscle").value = muscle;
+            // Store the selected primary muscle in a cookie or local storage
+            document.cookie = `selectedPrimaryMuscle=${selectedPrimaryMuscle};path=/`; // Store in a cookie
+            // Highlight the selected primary muscle
+            var muscles = document.querySelectorAll('.primaryMuscle');
+            muscles.forEach(function (elem) {
+                elem.classList.remove('selected');
+            });
+            document.querySelector(`.primaryMuscle[data-muscle="${selectedPrimaryMuscle}"]`).classList.add('selected');
+
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.addEventListener('click', () => {
+                    section.classList.toggle('zoomed');
+                });
+            });
+        }
+
+        // Function to clear the selected primary muscle
+        function clearSelectedPrimaryMuscle() {
+            selectedPrimaryMuscle = null;
+            document.querySelector("#selectedPrimaryMuscle").value = "";
+
+            // Remove the 'selected' class from all primary muscles
+            var muscles = document.querySelectorAll('.primaryMuscle');
+            muscles.forEach(function (elem) {
+                elem.classList.remove('selected');
+            });
+        }
+    </script>
+
+
+</body>
+
+
+</html>

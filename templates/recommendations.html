@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exercise Recommendations</title>
+    <title>Recommend exercises</title>
     <style>
         /* CSS for Exercise Recommendations */
 
@@ -12,7 +12,7 @@
         .container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
+            /* padding: 20px; */
             padding-left: 5px;
             padding-right: 5px;
         }
@@ -72,47 +72,29 @@
 
 <body>
     <div class="container">
-        <h1>Exercise Recommendations</h1>
-        <h2>Recommended Exercises</h2>
+        <h1>Recommend exercises tailored to your preference details</h1>
         <ul>
             {% for exercise in recommendations %}
-            <li class="exercise-frame">
-                <h3 class="exercise-name">{{ exercise.name }}</h3>
-
-                <!-- Display Images -->
-                <div class="images-section">
-                    {% for image in exercise.images %}
-                    <img class="exercise-image"
-                        src="{{ url_for('static', filename='/exercises/' ~ exercise.id ~ '/images/' ~ image) }}"
-                        alt="Exercise Image">
-                    {% endfor %}
-                </div>
-
+            <h3 class="exercise-name">{{ exercise.name }}</h3>
+            <!-- Display Images -->
+            <div class="images-section">
+                {% for image in exercise.images %}
+                <img class="exercise-image"
+                    src="{{ url_for('static', filename='/exercises/' ~ exercise.id ~ '/images/' ~ image) }}"
+                    alt="Exercise Image">
+                {% endfor %}
+            </div>
+            <div class="exercise-frame">
                 <!-- Display Instructions -->
                 <div class="instructions-section">
                     {% for instruction in exercise.instructions.split('<br>') %}
                     <p class="instruction">{{ instruction | safe }}</p>
                     {% endfor %}
                 </div>
-
-            </li>
+            </div>
             {% endfor %}
         </ul>
-
-        <!-- Display the user input data including secondary muscles -->
-        <div class="user-input">
-            <h2>User Input:</h2>
-            <p><label>Force:</label> {{ user_input.force }}</p>
-            <p><label>Level:</label> {{ user_input.level }}</p>
-            <p><label>Mechanic:</label> {{ user_input.mechanic }}</p>
-            <p><label>Equipment:</label> {{ user_input.equipment }}</p>
-            <p><label>Primary Muscles:</label> {{ user_input.primaryMuscles }}</p>
-
-            <!-- Display the Secondary Muscles without brackets and quotes -->
-            <p><label>Secondary Muscles:</label> {{ user_input.secondaryMuscles | join(', ') }}</p>
-
-            <p><label>Category:</label> {{ user_input.category }}</p>
-        </div>
+        <br><br>
     </div>
 </body>
 
