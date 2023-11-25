@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recommend exercises</title>
+    <title>More Recommended Exercises</title>
     <style>
         body {
             font-family: 'PrimaryMuscleFont', sans-serif;
@@ -102,7 +102,7 @@
 
         /* Image style */
         .exercise-image {
-            max-width: 48%;
+            max-width: 360px;
             border: 1px solid #333;
         }
 
@@ -132,23 +132,6 @@
         .user-input label {
             font-weight: bold;
         }
-
-        /* Additional styles for buttons */
-        .btn {
-            background-color: #007BFF;
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            border-radius: .375rem;
-            margin-left: 40px;
-            margin-top: 20px;
-        }
-
-        .btn:hover {
-            background-color: #0056b3;
-        }
-
     </style>
 </head>
 
@@ -167,7 +150,7 @@
         </nav>
     </header>
     <div class="container">
-        <h1>Exercises tailored to your preference details</h1>
+        <h1>More Recommended Exercises</h1>
         <ul>
             {% for exercise in recommendations %}
             <h3 class="exercise-name">{{ exercise.name }}</h3>
@@ -189,10 +172,6 @@
             </div>
             {% endfor %}
         </ul>
-        <form action="{{ url_for('more_recommendations') }}" method="POST">
-            <input type="hidden" name="user_input" value='{{ user_input | tojson | replace("'", '"') }}'>
-            <button class="btn" type="submit">More Recommend Exercise</button>
-        </form>
         <br><br>
     </div>
 </body>
