@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+/* Global styles */
+body {
+    font-family: 'PrimaryMuscleFont', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-image: url('{{ url_for('static', filename='welcome_background.jpg') }}');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/* Header styles */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    width: 88px;
+    height: 50px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+}
+
+nav ul li {
+    margin: 0 15px;
+    font-size: 1.2em;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #fefeff;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+nav ul li a:hover {
+    color: #007BFF;
+}
+
+/* Page content styles */
+.welcome-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: row;
+    width: 30%;
+    margin-bottom: 120px;
+    margin-left: 3%;
+    border-radius: 15px;
+    color: #fefeff;
+}
+
+.welcome-container a {
+    font-size: 1.8em;
+}
+
+.btn-beginner,
+.btn-advanced {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    text-decoration: none;
+    background-color: #007BFF;
+    color: #fefeff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.btn-beginner:hover,
+.btn-advanced:hover {
+    background-color: #0056b3;
+}
+</style>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='welcome.css') }}">
+    <title>Welcome</title>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <a href="/welcome"><img src="{{ url_for('static', filename='logo.jpg') }}" alt="Logo"></a>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/welcome">Home</a></li>
+                <li><a href="/beginner">Beginner</a></li>
+                <li><a href="/advanced">Advanced</a></li>
+                <!-- <li><a href="/insight">Insight</a></li> -->
+            </ul>
+        </nav>
+    </header>
+    <div class="welcome-container">
+        <a class="btn-beginner" href="/beginner">Beginner</a>
+        <a class="btn-advanced" href="/advanced">Advanced</a>
+    </div>
+</body>
+
+</html>

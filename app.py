@@ -1,17 +1,21 @@
-import json
-import re
-from flask import Flask, render_template, request, redirect, url_for, session, logging
+import json, re, os
+from flask import Flask, render_template, request, redirect, url_for, session
+from flask_session import Session
 from flask_pymongo import PyMongo
 import pandas as pd
 from pymongo import MongoClient
-from sklearn.feature_extraction.text import TfidfVectorizer 
-from sklearn.metrics.pairwise import linear_kernel
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import linear_kernel, cosine_similarity
 
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = 'exerciseapp'
 
+# Assuming 'data' is a subdirectory of the directory containing your script
+data_dir = os.path.join(os.path.dirname(__file__), 'data')
+
 # Process and modify the JSON data
-with open('data/exercises.json', 'r', encoding='utf-8') as file:
+json_file_path = os.path.join(data_dir, 'exercises.json')
+with open(json_file_path, 'r', encoding='utf-8') as file:
     exercises = json.load(file)
 
 # Modify exercise data to remove folder names in image filenames
@@ -23,10 +27,11 @@ for exercise in exercises:
 dataframe = pd.DataFrame(exercises)
 
 # Save the DataFrame to a CSV file with a comma delimiter
-dataframe.to_csv('data/exercises.csv', index=False, sep=',')
+csv_file_path = os.path.join(data_dir, 'exercises.csv')
+dataframe.to_csv(csv_file_path, index=False, sep=',')
 
 # Load the cleaned data from the CSV file
-df = pd.read_csv('data/exercises_cleaned.csv')
+df = pd.read_csv(csv_file_path)
 
 # Convert the 'images' field from a string to a list and strip single quotes
 df['images'] = df['images'].apply(lambda x: [image.strip(" '") for image in x.strip("[]").split(", ")])
@@ -44,10 +49,10 @@ df_dict = df.to_dict(orient='records')
 collection.insert_many(df_dict)
 
 # Define the priority for user input fields
-priority_fields = ['level', 'equipment', 'secondaryMuscles', 'force', 'mechanic', 'category']
+priority_fields = ['primaryMuscles','level', 'equipment', 'secondaryMuscles', 'force', 'mechanic', 'category']
 
 # Define priority weights
-priority_weights = [15, 10, 5, 3, 2, 1]
+priority_weights = [20, 15, 10, 5, 3, 2, 1]
 
 # Concatenate the relevant columns to create content for recommendations
 df['content'] = df[priority_fields].apply(
@@ -64,41 +69,53 @@ tfidf_matrix = tfidf_vectorizer.fit_transform(df['content'])
 # Calculate the cosine similarity between exercises
 cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
 
-# Define a global variable to store the selected primary muscle
-selected_primary_muscle = ""
-
 @app.route('/')
-def home():
-    return redirect(url_for('primary_muscle'))
+def welcome():
+    return render_template('welcome.html')
 
-@app.route('/primary-muscle', methods=['GET', 'POST']) 
-def primary_muscle():
+@app.route('/welcome')
+def welcome_page():
+    return render_template('welcome.html')
+
+@app.route('/beginner', methods=['GET', 'POST'])
+def beginner():
+    primary_muscles = ["Chest", "Biceps", "Abdominals", "Quadriceps", "Middle Back", "Glutes", "Hamstrings", "Calves "]
+    selected_primary_muscle = request.cookies.get('selectedPrimaryMuscle')
     if request.method == 'POST':
-        primary_muscle = request.form.get('primaryMuscle')
-        if primary_muscle:
-            session['selected_primary_muscle'] = primary_muscle
-            return redirect(url_for('user_input'))
+        # Handle form submission and update the selected primary muscle
+        selected_primary_muscle = request.form.get('selectedPrimaryMuscle')
+        # Store the selected primary muscle in the cookie or local storage
+        response = redirect(url_for('recommend_exercises'))
+        response.set_cookie('selectedPrimaryMuscle', selected_primary_muscle)
+        return response
+    return render_template('beginner.html', primary_muscles=primary_muscles, selectedPrimaryMuscle=selected_primary_muscle)
 
-    primary_muscles_left = ["Neck", "Shoulders", "Chest", "Biceps", "Forearms", "Abdominals", "Quadriceps", "Adductors", "Calves"]
-    primary_muscles_right = ["Traps", "Triceps", "Lats", "Middle Back", "Lower Back", "Abductors", "Glutes", "Hamstrings", "Calves"]
+@app.route('/advanced', methods=['GET', 'POST'])
+def advanced():
+    primary_muscles = ["Neck", "Shoulders", "Chest", "Biceps", "Forearms", "Abdominals", "Quadriceps", "Adductors", "Calves",
+                       "Traps", "Triceps", "Lats", "Middle Back", "Lower Back", "Abductors", "Glutes", "Hamstrings", "Calves "]
 
-    return render_template('primary_muscle.html', primary_muscles=primary_muscles_left + primary_muscles_right)
-
-@app.route('/user-input')
-def user_input():
-    selected_primary_muscle = session.get('selected_primary_muscle', None)
-    return render_template('user_input.html', primaryMuscle=selected_primary_muscle)
+    selected_primary_muscle = request.cookies.get('selectedPrimaryMuscle')
+    if request.method == 'POST':
+        # Handle form submission and update the selected primary muscle
+        selected_primary_muscle = request.form.get('selectedPrimaryMuscle')
+        # Store the selected primary muscle in the cookie or local storage
+        response = redirect(url_for('recommend_exercises'))
+        response.set_cookie('selectedPrimaryMuscle', selected_primary_muscle)
+        return response
+    return render_template('advanced.html', primary_muscles=primary_muscles, selectedPrimaryMuscle=selected_primary_muscle)
 
 @app.route('/recommend', methods=['GET', 'POST'])
 def recommend_exercises():
-    selected_primary_muscle = session.get('selected_primary_muscle', None)
-
+    exercise_data = []
+    user_input = {}
+    selected_primary_muscle= ""
     if request.method == 'POST':
-        # Get the user's input from the form fields
         user_input = {field: request.form.get(field) for field in priority_fields}
-        user_input['primaryMuscle'] = selected_primary_muscle  # Set the selected primary muscle
 
-        # Ensure that other values are not None before using them
+        # Retrieve the selected primary muscle from the cookie
+        selected_primary_muscle = request.cookies.get('selectedPrimaryMuscle', "")
+
         for field in priority_fields:
             if user_input[field] is None:
                 user_input[field] = ""  # Set to an empty string or a default value
@@ -117,28 +134,84 @@ def recommend_exercises():
             ''.join(map(str, user_input['category'])) * priority_weights[5]
         )
 
-        
         # Convert user content into TF-IDF vector for recommendation
         user_tfidf_matrix = tfidf_vectorizer.transform([user_content])
         user_cosine_sim = linear_kernel(user_tfidf_matrix, tfidf_matrix)
         sim_scores = user_cosine_sim[0]
         exercise_indices = sim_scores.argsort()[::-1][:5]  # Select top 5 recommendations
 
-        # Retrieve exercise data for the recommended exercises
-        exercise_data = []
-
         # Convert exercise_indices to a list of exercise IDs
         exercise_ids = [str(df.iloc[index]["id"]) for index in exercise_indices]
 
         for exercise_id in exercise_ids:
-            exercise_doc = collection.find_one({"id": exercise_id}) 
+            exercise_doc = collection.find_one({"id": exercise_id})
             if exercise_doc:
                 if 'instructions' in exercise_doc:
                     # Replace "\n" with "<br>" to add line breaks in the instructions
                     exercise_doc['instructions'] = exercise_doc['instructions'].replace('.,', '<br>')
                 exercise_data.append(exercise_doc)
-        # Render the recommendations template with the results
-        return render_template('recommendations.html', recommendations=exercise_data, user_input=user_input, primaryMuscle=selected_primary_muscle)
 
+        # Render the recommendations template with the results
+        return render_template('recommendations.html', recommendations=exercise_data, user_input=user_input, selectedPrimaryMuscle=selected_primary_muscle)
+    # Handle the case where there's no POST data (initial page load or form submission)
+    return render_template('recommendations.html', recommendations=exercise_data, user_input=user_input, selectedPrimaryMuscle=selected_primary_muscle)
+
+
+# Calculate the cosine similarity between exercises (item-based collaborative filtering)
+cosine_sim_items = cosine_similarity(tfidf_matrix.T, tfidf_matrix.T)
+
+@app.route('/more_recommendations', methods=['GET', 'POST'])
+def more_recommendations():
+    exercise_data = []
+    selected_primary_muscle = ""
+
+    if request.method == 'POST':
+        selected_primary_muscle = request.cookies.get('selectedPrimaryMuscle', "")
+
+        # Retrieve user input data from the hidden input field
+        user_input = json.loads(request.form.get('user_input', '{}'))
+
+        # Extract and process the secondary muscles
+        secondary_muscles = request.form.getlist('secondaryMuscles[]')
+        secondary_muscles_str = ' '.join(secondary_muscles)
+
+        user_content = (
+            selected_primary_muscle * 20 + ' ' +
+            ''.join(map(str, user_input.get('level', ''))) * priority_weights[0] + ' ' +
+            ''.join(map(str, user_input.get('equipment', ''))) * priority_weights[1] + ' ' +
+            secondary_muscles_str * priority_weights[2] + ' ' +
+            ''.join(map(str, user_input.get('force', ''))) * priority_weights[3] + ' ' +
+            ''.join(map(str, user_input.get('mechanic', ''))) * priority_weights[4] + ' ' +
+            ''.join(map(str, user_input.get('category', ''))) * priority_weights[5]
+        )
+
+        # Convert user content into TF-IDF vector for recommendation
+        user_tfidf_matrix = tfidf_vectorizer.transform([user_content])
+        user_cosine_sim = cosine_similarity(user_tfidf_matrix, tfidf_matrix)
+
+        # Calculate the similarity between the user's preferences and exercises (item-based collaborative filtering)
+        item_sim_scores = cosine_similarity(user_cosine_sim, tfidf_matrix.T)[0]
+        
+        # Get the indices of exercises based on item similarity
+        exercise_indices = item_sim_scores.argsort()[-5:][::-1]
+
+        # Convert exercise_indices to a list of exercise IDs
+        exercise_ids = [str(df.iloc[index]["id"]) for index in exercise_indices]
+
+        for exercise_id in exercise_ids:
+            exercise_doc = collection.find_one({"id": exercise_id})
+            if exercise_doc:
+                if 'instructions' in exercise_doc:
+                    # Replace "\n" with "<br>" to add line breaks in the instructions
+                    exercise_doc['instructions'] = exercise_doc['instructions'].replace('.,', '<br>')
+                exercise_data.append(exercise_doc)
+
+        # Render the more_recommendations template with the results
+        return render_template('more_recommendations.html', recommendations=exercise_data, user_input=user_input,
+                               selectedPrimaryMuscle=selected_primary_muscle)
+
+    # Handle the case where there's no POST data (initial page load or form submission)
+    return render_template('more_recommendations.html', recommendations=exercise_data, user_input=user_input,
+                           selectedPrimaryMuscle=selected_primary_muscle)
 if __name__ == '__main__':
     app.run(debug=True)
