@@ -232,12 +232,10 @@
         }
 
         /* CSS for navigation and background */
-        /* Global styles */
         body {
             font-family: 'PrimaryMuscleFont', sans-serif;
             margin: 0;
             padding: 0;
-            /* background-image: url('{{ url_for("static", filename="welcome_background.jpg") }}'); */
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
@@ -287,7 +285,6 @@
                 <li><a href="/welcome">Home</a></li>
                 <li><a href="/beginner">Beginner</a></li>
                 <li><a href="/advanced">Advanced</a></li>
-                <!-- <li><a href="/insight">Insight</a></li> -->
             </ul>
         </nav>
     </header>
@@ -321,7 +318,7 @@
                     </div>
                     <div class="muscle-list">
                         <ul>
-                            <!-- Loop through primary muscles (second group) -->
+                            <!-- Loop through primary muscles -->
                             {% for muscle in primary_muscles[4:] %}
                             <li>
                                 <button
