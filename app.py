@@ -1,24 +1,21 @@
-import json, re, os
-from flask import Flask, render_template, request, redirect, url_for, session
-from flask_session import Session
-from flask_pymongo import PyMongo
+import json, os
+from flask import Flask, render_template, request, redirect, url_for
 import pandas as pd
 from pymongo import MongoClient
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel, cosine_similarity
 
 app = Flask(__name__, static_url_path='/static')
-app.secret_key = 'exerciseapp'
 
-# Assuming 'data' is a subdirectory of the directory containing your script
+# data directory
 data_dir = os.path.join(os.path.dirname(__file__), 'data')
 
-# Process and modify the JSON data
+# Open json file
 json_file_path = os.path.join(data_dir, 'exercises.json')
 with open(json_file_path, 'r', encoding='utf-8') as file:
     exercises = json.load(file)
 
-# Modify exercise data to remove folder names in image filenames
+# Remove folder names in image filenames
 for exercise in exercises:
     images = exercise["images"]
     exercise["images"] = [image.split('/')[-1] for image in images]
@@ -26,12 +23,13 @@ for exercise in exercises:
 # Convert the modified exercise data to a pandas DataFrame
 dataframe = pd.DataFrame(exercises)
 
-# Save the DataFrame to a CSV file with a comma delimiter
+# Save the DataFrame to a CSV file
 csv_file_path = os.path.join(data_dir, 'exercises.csv')
 dataframe.to_csv(csv_file_path, index=False, sep=',')
+csv_cleaned_file_path = os.path.join(data_dir, 'exercises_cleaned.csv')
 
 # Load the cleaned data from the CSV file
-df = pd.read_csv(csv_file_path)
+df = pd.read_csv(csv_cleaned_file_path)
 
 # Convert the 'images' field from a string to a list and strip single quotes
 df['images'] = df['images'].apply(lambda x: [image.strip(" '") for image in x.strip("[]").split(", ")])
@@ -41,8 +39,8 @@ client = MongoClient("mongodb://localhost:27017/")
 db = client["exercisesdb"]
 collection = db["exercises"]
 
-# Drop the collection
-collection.drop()
+# # Drop the collection
+# collection.drop()
 
 # Insert the CSV data into MongoDB
 df_dict = df.to_dict(orient='records')
